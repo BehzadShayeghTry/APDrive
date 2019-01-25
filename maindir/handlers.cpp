@@ -92,10 +92,12 @@ Response *DownloadHandler::callback(Request *req) {
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
 
-  core->set_home_directory( req->getBodyParam("real-path") );
-  core->download(  req->getBodyParam("new-name") , req->getQueryParam("directory") );
+  Response *res = new Response;
+  res->setHeader("Content-Type", "application/binary-stream");
+  res->setHeader("Content-disposition", "attachment; filename="+req->getBodyParam("new-name"));
+  string body = core->show_media( req->getQueryParam("directory") );
+  res->setBody(body);
 
-  Response* res = Response::redirect("/dashboard");
   core->logout();
   return res;
 }

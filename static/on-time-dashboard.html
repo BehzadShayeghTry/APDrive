@@ -65,7 +65,7 @@
             <input id="n-7" type="checkbox"></input>
             <label id="info-icon" class="black-enable" for="n-7"><i class="fas fa-info-circle"></i></label>
             <div class="sub">
-              <p class="info-type">asd | file | root | read,write | root | -,- | 2249 bytes</p>
+              <p class="info-type">asd | file | root | read,write | root | -,- | 6268 bytes</p>
             </div>
           </div>
         </pre>
@@ -79,7 +79,6 @@
               <label class="options-info" for="n-8"><i class="fas fa-download" style="color: black;"></i></label>
               <div class="sub">
                 <form class="branch" action="/download?directory=/root/asd" method="post">
-                  <input name="real-path" type="text" placeholder="real path" /><br />
                   <input name="new-name" type="text" placeholder="new name" />
                   <button type="submit"><i id="add-icon" class="fas fa-arrow-alt-circle-down"></i></button>
                 </form>
@@ -94,12 +93,12 @@
 <div>
   <input id="n-9" type="checkbox"></input>
   <pre class="doc-line">
-    <label for="n-9"><i class="fas fa-folder-open"></i> behzad/</label>   <a href="/remove?directory=/behzad" class="black-enable"><i class="fas fa-trash-alt"></i></a>
+    <label for="n-9"><i class="fas fa-folder-open"></i> amir/</label>   <a href="/remove?directory=/amir" class="black-enable"><i class="fas fa-trash-alt"></i></a>
       <div class="doc-line">
         <input id="n-10" type="checkbox"></input>
         <label id="info-icon" class="black-enable" for="n-10"><i class="fas fa-info-circle"></i></label>
         <div class="sub">
-          <p class="info-type">behzad | folder | behzad | read,write | behzad | -,-</p>
+          <p class="info-type">amir | folder | amir | read,write | amir | -,-</p>
         </div>
       </div>
   </pre>
@@ -113,7 +112,7 @@
             <input id="n-12" type="checkbox"></input>
             <label for="n-12"><i class="fas fa-folder-plus"></i> add folder</label>
             <div class="sub">
-              <form class="branch" action="/makedirectory?directory=/behzad" method="post">
+              <form class="branch" action="/makedirectory?directory=/amir" method="post">
                 <input name="foldername" type="text" placeholder="new folder" />
                 <button type="submit"><i id="add-icon" class="fas fa-plus-square"></i></button>
               </form>
@@ -123,7 +122,7 @@
             <input id="n-13" type="checkbox"></input>
             <label for="n-13"><i class="fas fa-file-upload"></i> upload file</label>
             <div class="sub">
-              <form class="branch" action="/upload?directory=/behzad" method="post" enctype="multipart/form-data">
+              <form class="branch" action="/upload?directory=/amir" method="post" enctype="multipart/form-data">
                 <input type="file" name="file"><br />
                 <input name="file_name" type="text" placeholder="File Name" />
                 <button type="submit" ><i id="add-icon" class="fas fa-plus-square"></i></button>
@@ -135,26 +134,25 @@
       <div>
         <input id="n-14" type="checkbox"></input>
         <pre class="doc-line">
-          <label for="n-14" class="folder"><i class="fas fa-file"></i> asd</label>   <a href="/remove?directory=/behzad/asd" class="black-enable"><i class="fas fa-trash-alt"></i></a>
+          <label for="n-14" class="folder"><i class="fas fa-file"></i> core.cpp</label>   <a href="/remove?directory=/amir/core.cpp" class="black-enable"><i class="fas fa-trash-alt"></i></a>
           <div class="doc-line">
             <input id="n-15" type="checkbox"></input>
             <label id="info-icon" class="black-enable" for="n-15"><i class="fas fa-info-circle"></i></label>
             <div class="sub">
-              <p class="info-type">asd | file | behzad | read,write | behzad | -,- | 2249 bytes</p>
+              <p class="info-type">core.cpp | file | root | read,write | root | -,- | 36744 bytes</p>
             </div>
           </div>
         </pre>
         <div class="sub">
           <div class="file-options">
-            <a class="options-info" href="/show?directory=/behzad/asd"><i class="fas fa-eye" style="color: black;"></i></a>
-            <a class="options-info" href="/move?directory=/behzad/asd&order=copy"><i class="fas fa-copy" style="color: black;"></i></a>
-            <a class="options-info" href="/move?directory=/behzad/asd&order=cut"><i class="fas fa-cut" style="color: black;"></i></a>
+            <a class="options-info" href="/show?directory=/amir/core.cpp"><i class="fas fa-eye" style="color: black;"></i></a>
+            <a class="options-info" href="/move?directory=/amir/core.cpp&order=copy"><i class="fas fa-copy" style="color: black;"></i></a>
+            <a class="options-info" href="/move?directory=/amir/core.cpp&order=cut"><i class="fas fa-cut" style="color: black;"></i></a>
             <div>
               <input id="n-16" type="checkbox"></input>
               <label class="options-info" for="n-16"><i class="fas fa-download" style="color: black;"></i></label>
               <div class="sub">
-                <form class="branch" action="/download?directory=/behzad/asd" method="post">
-                  <input name="real-path" type="text" placeholder="real path" /><br />
+                <form class="branch" action="/download?directory=/amir/core.cpp" method="post">
                   <input name="new-name" type="text" placeholder="new name" />
                   <button type="submit"><i id="add-icon" class="fas fa-arrow-alt-circle-down"></i></button>
                 </form>
@@ -163,33 +161,46 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+<div>
+  <input id="n-17" type="checkbox"></input>
+  <pre class="doc-line">
+    <label for="n-17"><i class="fas fa-folder-open"></i> behzad/</label>   <a href="/remove?directory=/behzad" class="black-enable"><i class="fas fa-trash-alt"></i></a>
+      <div class="doc-line">
+        <input id="n-18" type="checkbox"></input>
+        <label id="info-icon" class="black-enable" for="n-18"><i class="fas fa-info-circle"></i></label>
+        <div class="sub">
+          <p class="info-type">behzad | folder | behzad | read,write | behzad | -,-</p>
+        </div>
+      </div>
+  </pre>
+  <div class="sub">
+    <div class="in">
       <div>
-        <input id="n-17" type="checkbox"></input>
-        <pre class="doc-line">
-          <label for="n-17" class="folder"><i class="fas fa-file"></i> asd</label>   <a href="/remove?directory=/behzad/asd" class="black-enable"><i class="fas fa-trash-alt"></i></a>
-          <div class="doc-line">
-            <input id="n-18" type="checkbox"></input>
-            <label id="info-icon" class="black-enable" for="n-18"><i class="fas fa-info-circle"></i></label>
+        <input id="n-19" type="checkbox"></input>
+        <label for="n-19"><i class="fas fa-plus-square"></i> new</label>
+        <div class="sub">
+          <div>
+            <input id="n-20" type="checkbox"></input>
+            <label for="n-20"><i class="fas fa-folder-plus"></i> add folder</label>
             <div class="sub">
-              <p class="info-type">asd | file | behzad | read,write | behzad | -,- | 2249 bytes</p>
+              <form class="branch" action="/makedirectory?directory=/behzad" method="post">
+                <input name="foldername" type="text" placeholder="new folder" />
+                <button type="submit"><i id="add-icon" class="fas fa-plus-square"></i></button>
+              </form>
             </div>
           </div>
-        </pre>
-        <div class="sub">
-          <div class="file-options">
-            <a class="options-info" href="/show?directory=/behzad/asd"><i class="fas fa-eye" style="color: black;"></i></a>
-            <a class="options-info" href="/move?directory=/behzad/asd&order=copy"><i class="fas fa-copy" style="color: black;"></i></a>
-            <a class="options-info" href="/move?directory=/behzad/asd&order=cut"><i class="fas fa-cut" style="color: black;"></i></a>
-            <div>
-              <input id="n-19" type="checkbox"></input>
-              <label class="options-info" for="n-19"><i class="fas fa-download" style="color: black;"></i></label>
-              <div class="sub">
-                <form class="branch" action="/download?directory=/behzad/asd" method="post">
-                  <input name="real-path" type="text" placeholder="real path" /><br />
-                  <input name="new-name" type="text" placeholder="new name" />
-                  <button type="submit"><i id="add-icon" class="fas fa-arrow-alt-circle-down"></i></button>
-                </form>
-              </div>
+          <div>
+            <input id="n-21" type="checkbox"></input>
+            <label for="n-21"><i class="fas fa-file-upload"></i> upload file</label>
+            <div class="sub">
+              <form class="branch" action="/upload?directory=/behzad" method="post" enctype="multipart/form-data">
+                <input type="file" name="file"><br />
+                <input name="file_name" type="text" placeholder="File Name" />
+                <button type="submit" ><i id="add-icon" class="fas fa-plus-square"></i></button>
+              </form>
             </div>
           </div>
         </div>

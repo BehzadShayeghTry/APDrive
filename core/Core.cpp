@@ -258,7 +258,6 @@ string Core::body_folder(Document* main_doc, int &n) {
           body += "              <label class=\"options-info\" for=\"n-"+to_string(n)+"\"><i class=\"fas fa-download\" style=\"color: black;\"></i></label>\n";
           body += "              <div class=\"sub\">\n";
           body += "                <form class=\"branch\" action=\"/download?directory="+contents[i]->path()+"\" method=\"post\">\n";
-          body += "                  <input name=\"real-path\" type=\"text\" placeholder=\"real path\" /><br />\n";
           body += "                  <input name=\"new-name\" type=\"text\" placeholder=\"new name\" />\n";
           body += "                  <button type=\"submit\"><i id=\"add-icon\" class=\"fas fa-arrow-alt-circle-down\"></i></button>\n";
           body += "                </form>\n";
