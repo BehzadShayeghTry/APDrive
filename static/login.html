@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600">
+
+    <title>LogIn Page</title>
+  </head>
+
+
+  <body>
+
+    <i id="home-icon" class="fas fa-home"></i>
+
+    <div class="login-card">
+      
+        <form action="/login" method="post">
+
+          <h1 class="card-title">Log In</h1>
+          <input name="username" type="text" class="input" placeholder="username" autofocus />
+          <br />
+          <input name="password" type="password" class="input" placeholder="password" />
+          <br />
+          <button type="submit" class="button">Log In</button>
+    
+      </form>
+
+    </div>
+
+  </body>
+
+</html>
+
+
+
+
+
+
+
+<style type="text/css">
+
+  html {
+    height: 100%;
+  }
+
+  body {
+    background: #aa00ff;
+    background-image: url("https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80");
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size:cover;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #home-icon {
+    font-size: 150px;
+    margin: 50px auto;
+    color: #da9aec;
+  }
+
+  .login-card {
+    background: white;
+    border: 1px solid #c4c4c4;
+    border-radius: 15px;
+    margin: 0px auto;
+    width: 300px;
+    padding: 30px 25px;
+    font-family: 'Open Sans', sans-serif;
+  }
+
+  h1.card-title {
+    border: none;
+    margin: -28px -25px 25px;
+    padding: 15px 25px;
+    line-height: 30px;
+    font-size: 25px;
+    font-weight: 300;
+    color: #3f1c7b;
+    text-align:center;
+    background: transparent;
+    margin: -10px -10px -17px;
+  }
+
+  .input {
+    width: 255px;
+    height: 20px;
+    margin: 25px;
+    padding: 10px;
+    position: relative;
+    left: -15px;
+    font-size: 15px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: -19px;
+  }
+
+  .input:focus {
+      border-color:#6e8095;
+      outline: none;
+    }
+
+  .button {
+    width: 100%;
+    height: 50px;
+    padding: 0;
+    font-size: 20px;
+    color: #fff;
+    text-align: center;
+    background: #3f1c7b;
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer; 
+    outline:0;
+    margin-top: 48px;
+    margin-left: -4px;
+  }
+</style>
