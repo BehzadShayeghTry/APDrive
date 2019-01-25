@@ -5,6 +5,86 @@
 #include "../server/server.hpp"
 using namespace std;
 // body += "<i class=\"fas fa-paste\"></i>\n";
+
+string Core::body_folder_paste_page(Document* main_doc, int &n, string sorce_dir, string order) {
+  vector<Document*> contents = main_doc->get_contents();
+  string body;
+
+  body += "<div>\n";
+  body += "  <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
+  body += "  <pre class=\"doc-line\">\n";
+  body += "    <label for=\"n-"+to_string(n)+"\"><i class=\"fas fa-folder-open\"></i> "+main_doc->get_name()+"</label>"; //---
+  if(n>0) {
+    body += (check_hole_rw_access_http(main_doc, Document::WRITE)) ? //paste icon
+             "   <a href=\"/moving?target-dir="+main_doc->path()+"&sorce-dir="+sorce_dir+"&order="+order+"\" class=\"black-enable\"><i class=\"fas fa-paste\"></i></a>\n" :
+             "   <i class=\"red-trash-unable fas fa-paste\"></i>\n";
+  }
+  body += "  </pre>\n";
+  body += "  <div class=\"sub\">\n";
+  body += "    <div class=\"in\">\n";
+  for(int i=0; i<contents.size(); i++) {
+    if( contents[i]->is_folder() ){
+      if( check_rw_access_http(contents[i], Document::READ) )
+        body += body_folder_paste_page(contents[i], n, sorce_dir, order);
+      else {
+        body += "      <pre class=\"doc-line red-unable\"><i class=\"fas fa-folder-open\"></i> "+contents[i]->get_name(); //---
+        body += (check_rw_access_http(contents[i], Document::WRITE)) ? //paste icon
+                     "   <a href=\"/moving?target-dir="+main_doc->path()+"&sorce-dir="+sorce_dir+"&order="+order+"\" class=\"black-enable\"><i class=\"fas fa-paste\"></i></a>\n" :
+                     "   <i class=\"red-trash-unable fas fa-paste\"></i></pre>\n";
+      }
+    }
+  }
+  body += "    </div>\n";
+  body += "  </div>\n";
+  body += "</div>\n";
+
+  return body;
+}
+
+string Core::setPastePageBody(string sorce_dir, string order) {
+  string body;
+  int n=-1;
+
+  ifstream Dashboard_css("static/Dashboard.css");
+  string css, css_line;
+  while( getline(Dashboard_css,css_line) )
+    css += css_line + "\n";
+
+  body += "<!DOCTYPE html>\n";
+  body += "<html>\n";
+  body += "<head>";
+  body += "  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.6.3/css/all.css\" integrity=\"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/\" crossorigin=\"anonymous\">";
+  body += "  <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css?family=Open+Sans:400,600\">";
+  body += "  <title>Paste directory</title>";
+  body += "</head>";
+  body += "<body>\n";
+  body += "  <h1>Choose a path to Paste file:</h1>\n";
+  body += "  <div class=\"under_line\">\n";
+  body += "    <div class=\"left_side\">\n";
+  body += "      <a href=\"/dashboard\" class=\"left_icons\"><i class=\"fas fa-door-open\"></i></a>\n";
+  body += "    </div>\n";
+  body += "    <div class=\"main\">";
+  body += "      <i id=\"archive-icon\" class=\"fas fa-archive\"></i>";
+  body += "      <form class=\"prime\">\n";
+  body += "        <h2>Choose a path to Paste file: </h2>\n";
+  body += "        <div class=\"tree\">\n";
+  body += body_folder_paste_page(Root,n,sorce_dir,order);
+  body += "        </div>\n";
+  body += "      </form>\n";
+  body += "    </div>";
+  body += "    <div class=\"right_side\">\n";
+  body += "      <a href=\"/logout\" id=\"logout-icon\"><i class=\"fas fa-sign-out-alt\"></i></a>";
+  body += "    </div>\n";     
+  body += "  </div>";
+  body += "</body>\n";
+  body += "</html>\n\n";
+  body += css;
+  
+  ofstream file("./static/on-time-pasteboard.html");
+  file << body;
+  return body;
+}
+
 string Core::setUserListBody() {
   string body;
 
@@ -163,6 +243,9 @@ string Core::body_folder(Document* main_doc, int &n) {
         body += "        </pre>\n";
         body += "        <div class=\"sub\">\n";
         body += "          <div class=\"file-options\">\n";
+        body += (check_rw_access_http(contents[i], Document::READ)) ? //read icon
+                "            <a class=\"options-info\" href=\"/show?directory="+contents[i]->path()+"\"><i class=\"fas fa-eye\" style=\"color: black;\"></i></a>\n" :
+                "            <i class=\"options-info fas fa-eye\" style=\"color: red;\"></i>\n";
         body += (check_rw_access_http(contents[i], Document::READ)) ? //copy icon
                 "            <a class=\"options-info\" href=\"/move?directory="+contents[i]->path()+"&order=copy\"><i class=\"fas fa-copy\" style=\"color: black;\"></i></a>\n" :
                 "            <i class=\"options-info fas fa-copy\" style=\"color: red;\"></i>\n";
@@ -325,7 +408,36 @@ bool Core::check_hole_rw_access_http(Document* doc, Document::Access acc) {
     return doc->hole_access(on_time_user,acc);
 }
 
-// ------------------------------------------------------------------------------------
+string Core::read_name_of_path(string path) {
+    vector<string> all = read_path(path);
+    return all[all.size()-1];
+}
+
+string Core::show_media(string target) {
+    check_on_time_user();
+
+    vector<string> dirs = read_path(target);
+    if(target[target.size()-1]=='/'){
+        logout();
+        throw Server::Exception("need file name");
+    }
+    string file_name = dirs[dirs.size()-1];
+    dirs.pop_back();
+    Document* target_dir = target[0]=='/' ? find_diraction(Root,dirs) :
+                            find_diraction(on_time_directory,dirs);
+    Document* downloading_file = target_dir->select_file(file_name);
+
+    check_rw_access(downloading_file, Document::READ);
+
+    vector<unsigned char> buffer = downloading_file->get_buffer();
+    string output;
+    for(int i=0; i<buffer.size(); i++)
+        output.push_back(buffer[i]);
+
+    return output;
+}
+
+// --------------------------------------------------------------------------------------------
 
 Core::Core() {
     Root = new Folder();

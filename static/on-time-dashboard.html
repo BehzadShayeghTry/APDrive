@@ -60,24 +60,131 @@
       <div>
         <input id="n-6" type="checkbox"></input>
         <pre class="doc-line">
-          <label for="n-6" class="folder"><i class="fas fa-file"></i> qwe</label>   <a href="/remove?directory=/root/qwe" class="black-enable"><i class="fas fa-trash-alt"></i></a>
+          <label for="n-6" class="folder"><i class="fas fa-file"></i> asd</label>   <a href="/remove?directory=/root/asd" class="black-enable"><i class="fas fa-trash-alt"></i></a>
           <div class="doc-line">
             <input id="n-7" type="checkbox"></input>
             <label id="info-icon" class="black-enable" for="n-7"><i class="fas fa-info-circle"></i></label>
             <div class="sub">
-              <p class="info-type">qwe | file | root | read,write | root | -,- | 6268 bytes</p>
+              <p class="info-type">asd | file | root | read,write | root | -,- | 2249 bytes</p>
             </div>
           </div>
         </pre>
         <div class="sub">
           <div class="file-options">
-            <a class="options-info" href="/move?directory=/root/qwe&order=copy"><i class="fas fa-copy" style="color: black;"></i></a>
-            <a class="options-info" href="/move?directory=/root/qwe&order=cut"><i class="fas fa-cut" style="color: black;"></i></a>
+            <a class="options-info" href="/show?directory=/root/asd"><i class="fas fa-eye" style="color: black;"></i></a>
+            <a class="options-info" href="/move?directory=/root/asd&order=copy"><i class="fas fa-copy" style="color: black;"></i></a>
+            <a class="options-info" href="/move?directory=/root/asd&order=cut"><i class="fas fa-cut" style="color: black;"></i></a>
             <div>
               <input id="n-8" type="checkbox"></input>
               <label class="options-info" for="n-8"><i class="fas fa-download" style="color: black;"></i></label>
               <div class="sub">
-                <form class="branch" action="/download?directory=/root/qwe" method="post">
+                <form class="branch" action="/download?directory=/root/asd" method="post">
+                  <input name="real-path" type="text" placeholder="real path" /><br />
+                  <input name="new-name" type="text" placeholder="new name" />
+                  <button type="submit"><i id="add-icon" class="fas fa-arrow-alt-circle-down"></i></button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div>
+  <input id="n-9" type="checkbox"></input>
+  <pre class="doc-line">
+    <label for="n-9"><i class="fas fa-folder-open"></i> behzad/</label>   <a href="/remove?directory=/behzad" class="black-enable"><i class="fas fa-trash-alt"></i></a>
+      <div class="doc-line">
+        <input id="n-10" type="checkbox"></input>
+        <label id="info-icon" class="black-enable" for="n-10"><i class="fas fa-info-circle"></i></label>
+        <div class="sub">
+          <p class="info-type">behzad | folder | behzad | read,write | behzad | -,-</p>
+        </div>
+      </div>
+  </pre>
+  <div class="sub">
+    <div class="in">
+      <div>
+        <input id="n-11" type="checkbox"></input>
+        <label for="n-11"><i class="fas fa-plus-square"></i> new</label>
+        <div class="sub">
+          <div>
+            <input id="n-12" type="checkbox"></input>
+            <label for="n-12"><i class="fas fa-folder-plus"></i> add folder</label>
+            <div class="sub">
+              <form class="branch" action="/makedirectory?directory=/behzad" method="post">
+                <input name="foldername" type="text" placeholder="new folder" />
+                <button type="submit"><i id="add-icon" class="fas fa-plus-square"></i></button>
+              </form>
+            </div>
+          </div>
+          <div>
+            <input id="n-13" type="checkbox"></input>
+            <label for="n-13"><i class="fas fa-file-upload"></i> upload file</label>
+            <div class="sub">
+              <form class="branch" action="/upload?directory=/behzad" method="post" enctype="multipart/form-data">
+                <input type="file" name="file"><br />
+                <input name="file_name" type="text" placeholder="File Name" />
+                <button type="submit" ><i id="add-icon" class="fas fa-plus-square"></i></button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <input id="n-14" type="checkbox"></input>
+        <pre class="doc-line">
+          <label for="n-14" class="folder"><i class="fas fa-file"></i> asd</label>   <a href="/remove?directory=/behzad/asd" class="black-enable"><i class="fas fa-trash-alt"></i></a>
+          <div class="doc-line">
+            <input id="n-15" type="checkbox"></input>
+            <label id="info-icon" class="black-enable" for="n-15"><i class="fas fa-info-circle"></i></label>
+            <div class="sub">
+              <p class="info-type">asd | file | behzad | read,write | behzad | -,- | 2249 bytes</p>
+            </div>
+          </div>
+        </pre>
+        <div class="sub">
+          <div class="file-options">
+            <a class="options-info" href="/show?directory=/behzad/asd"><i class="fas fa-eye" style="color: black;"></i></a>
+            <a class="options-info" href="/move?directory=/behzad/asd&order=copy"><i class="fas fa-copy" style="color: black;"></i></a>
+            <a class="options-info" href="/move?directory=/behzad/asd&order=cut"><i class="fas fa-cut" style="color: black;"></i></a>
+            <div>
+              <input id="n-16" type="checkbox"></input>
+              <label class="options-info" for="n-16"><i class="fas fa-download" style="color: black;"></i></label>
+              <div class="sub">
+                <form class="branch" action="/download?directory=/behzad/asd" method="post">
+                  <input name="real-path" type="text" placeholder="real path" /><br />
+                  <input name="new-name" type="text" placeholder="new name" />
+                  <button type="submit"><i id="add-icon" class="fas fa-arrow-alt-circle-down"></i></button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <input id="n-17" type="checkbox"></input>
+        <pre class="doc-line">
+          <label for="n-17" class="folder"><i class="fas fa-file"></i> asd</label>   <a href="/remove?directory=/behzad/asd" class="black-enable"><i class="fas fa-trash-alt"></i></a>
+          <div class="doc-line">
+            <input id="n-18" type="checkbox"></input>
+            <label id="info-icon" class="black-enable" for="n-18"><i class="fas fa-info-circle"></i></label>
+            <div class="sub">
+              <p class="info-type">asd | file | behzad | read,write | behzad | -,- | 2249 bytes</p>
+            </div>
+          </div>
+        </pre>
+        <div class="sub">
+          <div class="file-options">
+            <a class="options-info" href="/show?directory=/behzad/asd"><i class="fas fa-eye" style="color: black;"></i></a>
+            <a class="options-info" href="/move?directory=/behzad/asd&order=copy"><i class="fas fa-copy" style="color: black;"></i></a>
+            <a class="options-info" href="/move?directory=/behzad/asd&order=cut"><i class="fas fa-cut" style="color: black;"></i></a>
+            <div>
+              <input id="n-19" type="checkbox"></input>
+              <label class="options-info" for="n-19"><i class="fas fa-download" style="color: black;"></i></label>
+              <div class="sub">
+                <form class="branch" action="/download?directory=/behzad/asd" method="post">
                   <input name="real-path" type="text" placeholder="real path" /><br />
                   <input name="new-name" type="text" placeholder="new name" />
                   <button type="submit"><i id="add-icon" class="fas fa-arrow-alt-circle-down"></i></button>
@@ -279,7 +386,7 @@
 	  float: left;
 	  position: relative;
 	  margin: 0px;
-	  margin-left: 35px;
+	  margin-left: 25px;
 	  padding: 5px;
 	  border-radius: 5px;
 	  color: #a22727;

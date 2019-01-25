@@ -11,6 +11,42 @@ struct Client {
   std::string sid;
 };
 
+class ShowHandler : public RequestHandler {
+public:
+  ShowHandler(Core*, std::vector<Client>*);
+  Response *callback(Request *);
+private:
+  Core* core;
+  std::vector<Client>* clients;
+};
+
+class MovingHandler : public RequestHandler {
+public:
+  MovingHandler(Core*, std::vector<Client>*);
+  Response *callback(Request *);
+private:
+  Core* core;
+  std::vector<Client>* clients;
+};
+
+class MoveHandler : public RequestHandler {
+public:
+  MoveHandler(Core*, std::vector<Client>*);
+  Response *callback(Request *);
+private:
+  Core* core;
+  std::vector<Client>* clients;
+};
+
+class DownloadHandler : public RequestHandler {
+public:
+  DownloadHandler(Core*, std::vector<Client>*);
+  Response *callback(Request *);
+private:
+  Core* core;
+  std::vector<Client>* clients;
+};
+
 class RemoveHandler : public RequestHandler {
 public:
   RemoveHandler(Core*, std::vector<Client>*);
@@ -85,11 +121,12 @@ private:
 
 class LoginHandler : public RequestHandler {
 public:
-  LoginHandler(Core *, std::vector<Client>*);
+  LoginHandler(Core *, std::vector<Client>*, int*);
   Response *callback(Request *);
 private:
   Core* core;
   std::vector<Client>* clients;
+  int *sid_number;
 };
 
 class LogoutHandler : public RequestHandler {
@@ -98,9 +135,4 @@ public:
 	Response *callback(Request *);
 private:
 	std::vector<Client>* clients;
-};
-
-class RandomNumberHandler : public RequestHandler {
-public:
-  Response *callback(Request *);
 };

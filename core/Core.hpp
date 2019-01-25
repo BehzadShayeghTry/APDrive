@@ -17,10 +17,14 @@ public:
     std::string setBody();
     std::string body_folder(Document*, int&);
     std::string setUserListBody();
+    std::string setPastePageBody(std::string, std::string);
+    std::string body_folder_paste_page(Document*, int&, std::string, std::string);
     void upload_http(std::string, std::string);
     User::AccessLevel get_working_user_accesslevel();
     bool check_rw_access_http(Document*, Document::Access);
     bool check_hole_rw_access_http(Document*, Document::Access);
+    std::string read_name_of_path(std::string);
+    std::string show_media(std::string);
 
 public:
     Core();

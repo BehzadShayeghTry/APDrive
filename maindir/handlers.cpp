@@ -15,6 +15,91 @@ int find_client_index_sid(std::string sid, const vector<Client> clients){
   return -1;
 }
 
+ShowHandler::ShowHandler(Core* _core, vector<Client> *_clients) {
+  core = _core;
+  clients = _clients;
+}
+
+Response *ShowHandler::callback(Request *req) {
+  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  if(index == -1) throw Server::Exception("you should login first...");
+  core->login((*clients)[index].username, (*clients)[index].password);
+
+  Response *res = new Response;
+  res->setHeader("Content-Type", "text/html");
+  string body;
+
+  body += "<html> <body> <pre>";
+  body += core->show_media( req->getQueryParam("directory") );
+  body += "</pre></body><html>";
+
+  res->setBody(body);
+  core->logout();
+  return res;
+}
+
+MovingHandler::MovingHandler(Core* _core, vector<Client> *_clients) {
+  core = _core;
+  clients = _clients;
+}
+
+Response *MovingHandler::callback(Request *req) {
+  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  if(index == -1) throw Server::Exception("you should login first...");
+  core->login((*clients)[index].username, (*clients)[index].password);
+
+  string sorce = req->getQueryParam("sorce-dir");
+  string target = req->getQueryParam("target-dir") + "/" + core->read_name_of_path(sorce);
+
+  if( req->getQueryParam("order") == "copy" )
+    core->copy( sorce , target );
+  else if( req->getQueryParam("order") == "cut" )
+    core->move( sorce , target );
+  else
+    throw Server::Exception("Unknown order ...");
+
+  Response* res = Response::redirect("/dashboard");
+  core->logout();
+  return res;
+}
+
+MoveHandler::MoveHandler(Core* _core, vector<Client> *_clients) {
+  core = _core;
+  clients = _clients;
+}
+
+Response *MoveHandler::callback(Request *req) {
+  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  if(index == -1) throw Server::Exception("you should login first...");
+  core->login((*clients)[index].username, (*clients)[index].password);
+
+  Response *res = new Response;
+  res->setHeader("Content-Type", "text/html");
+  string body = core->setPastePageBody( req->getQueryParam("directory"), req->getQueryParam("order") );
+
+  res->setBody(body);
+  core->logout();
+  return res;
+}
+
+DownloadHandler::DownloadHandler(Core* _core, vector<Client> *_clients) {
+  core = _core;
+  clients = _clients;
+}
+
+Response *DownloadHandler::callback(Request *req) {
+  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  if(index == -1) throw Server::Exception("you should login first...");
+  core->login((*clients)[index].username, (*clients)[index].password);
+
+  core->set_home_directory( req->getBodyParam("real-path") );
+  core->download(  req->getBodyParam("new-name") , req->getQueryParam("directory") );
+
+  Response* res = Response::redirect("/dashboard");
+  core->logout();
+  return res;
+}
+
 RemoveHandler::RemoveHandler(Core* _core, vector<Client> *_clients) {
   core = _core;
   clients = _clients;
@@ -185,9 +270,10 @@ Response *LoginGetter::callback(Request *req) {
   return res;
 }
 
-LoginHandler::LoginHandler(Core* _core, vector<Client> *_clients) {
+LoginHandler::LoginHandler(Core* _core, vector<Client> *_clients, int* n) {
   core = _core;
   clients = _clients;
+  sid_number = n;
 }
 
 Response *LoginHandler::callback(Request *req) {
@@ -199,7 +285,7 @@ Response *LoginHandler::callback(Request *req) {
 
   core->login(username,password);
 
-  string sid = "user"+to_string((*clients).size()+65);
+  string sid = "user"+to_string( ++(*sid_number) )+to_string((*clients).size())+to_string( rand()%100000 );
   Client new_client;
   new_client.username = username;
   new_client.password = password;
@@ -227,27 +313,5 @@ Response *LogoutHandler::callback(Request *req) {
   (*clients).erase((*clients).begin()+index);
 
   Response *res = Response::redirect("/login");
-  return res;
-}
-
-Response *RandomNumberHandler::callback(Request *req) {
-  Response *res = new Response;
-  res->setHeader("Content-Type", "text/html");
-  string body;
-  body += "<!DOCTYPE html>";
-  body += "<html>";
-  body += "<body style=\"text-align: center;\">";
-  body += "<h1>AP HTTP</h1>";
-  body += "<p>";
-  body += "a random number in [1, 10] is: ";
-  body += to_string(rand() % 10 + 1);
-  body += "</p>";
-  body += "<p>";
-  body += "SeddionId: ";
-  body += req->getSessionId();
-  body += "</p>";
-  body += "</body>";
-  body += "</html>";
-  res->setBody(body);
   return res;
 }
