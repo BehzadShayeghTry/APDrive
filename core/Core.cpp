@@ -24,8 +24,6 @@ string Core::dashboardBody() {
   replace_all("$(User_name)", get_working_username(), body);  
   replace_all("$(Root_folder)", folderBody(Root,n), body);  
 
-  ofstream file("static/on_time_dashboard.html");
-  file << body;
   return body;
 }
 
@@ -353,8 +351,6 @@ string Core::pastePageBody(string sorce_dir, string order) {
 
   replace_all("$(Root_folder)", pasteFolderPageBody(Root,n,sorce_dir,order), body);
 
-  ofstream file("./static/on-time-pasteboard.html");
-  file << body;
   return body;
 }
 
