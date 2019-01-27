@@ -4,7 +4,11 @@
 #include "Group.hpp"
 #include "../server/server.hpp"
 using namespace std;
-// body += "<i class=\"fas fa-paste\"></i>\n";
+
+void replace_all(string before, string now, string& str) {
+    for ( int character = str.find(before); character >= 0; character = str.find(before) )
+        str.replace(character, before.size(), now);
+}
 
 string Core::body_folder_paste_page(Document* main_doc, int &n, string sorce_dir, string order) {
   vector<Document*> contents = main_doc->get_contents();
@@ -14,7 +18,7 @@ string Core::body_folder_paste_page(Document* main_doc, int &n, string sorce_dir
   body += "  <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
   body += "  <pre class=\"doc-line\">\n";
   body += "    <label for=\"n-"+to_string(n)+"\"><i class=\"fas fa-folder-open\"></i> "+main_doc->get_name()+"</label>"; //---
-  if(n>0) {
+  if((main_doc != Root)) {
     body += (check_hole_rw_access_http(main_doc, Document::WRITE)) ? //paste icon
              "   <a href=\"/moving?target-dir="+main_doc->path()+"&sorce-dir="+sorce_dir+"&order="+order+"\" class=\"black-enable\"><i class=\"fas fa-paste\"></i></a>\n" :
              "   <i class=\"red-trash-unable fas fa-paste\"></i>\n";
@@ -41,7 +45,7 @@ string Core::body_folder_paste_page(Document* main_doc, int &n, string sorce_dir
   return body;
 }
 
-string Core::setPastePageBody(string sorce_dir, string order) {
+string Core::pastePageBody(string sorce_dir, string order) {
   string body;
   int n=-1;
 
@@ -85,268 +89,256 @@ string Core::setPastePageBody(string sorce_dir, string order) {
   return body;
 }
 
-string Core::setUserListBody() {
+string Core::userListBody() {
   string body;
 
-  ifstream Dashboard_css("static/Dashboard.css");
-  string css, css_line;
-  while( getline(Dashboard_css,css_line) )
-    css += css_line + "\n";
+  ifstream userlist_static("static/userlist.html");
+  string body_line;
+  while( getline(userlist_static, body_line) )
+    body += body_line + "\n";
 
-  body += "<!DOCTYPE html>\n";
-  body += "<html>\n";
-  body += "  <head>";
-  body += "    <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.6.3/css/all.css\" integrity=\"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/\" crossorigin=\"anonymous\">";
-  body += "    <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css?family=Open+Sans:400,600\">";
-  body += "    <title>User list</title>";
-  body += "  </head>";
-  body += "<body>\n";
-  body += "  <h1>User list</h1>\n";
-  body += "  <div class=\"under_line\">\n";
-  body += "    <div class=\"left_side\">\n";
-  body += "    <a href=\"/dashboard\" class=\"left_icons\"><i class=\"fas fa-door-open\"></i></a>\n";
+  string adduserdoor_html;
   if(on_time_user->get_access_level() > User::ADMIN)
-    body += "      <a href=\"/signup\" class=\"left_icons\"><i class=\"fas fa-user-plus\"></i></a>\n";
-  body += "  </div>\n";
-  body += "  <div class=\"main\">";
-  body += "    <i id=\"archive-icon\" class=\"fas fa-users-cog\"></i>";
-  body += "    <form class=\"prime\" action=\"/makedirectory\" method=\"post\">\n";
-  body += "      <h2>Users: </h2>\n";
-  body += "      <div class=\"userlist\">\n";
-  body += "        <p>root .</p>\n";
+    adduserdoor_html += "      <a href=\"/signup\" class=\"left_icons\"><i class=\"fas fa-user-plus\"></i></a>\n";
+  replace_all("$(Add_user_door)", adduserdoor_html, body);
+  
   for(int i=1; i<users.size(); i++) {
-    body += "        <pre>"+users[i]->get_user_name()+" :\t\t"; //---
-    body +=          access_level_reader(users[i]->get_access_level()); //---
-    body +=          "  |<a href=\"/changemote?order=promote&user="+users[i]->get_user_name(); //---
-    body +=          "&mote="+access_level_reader(users[i]->get_access_level())+"\"><i id=\"up-down-icon\" class=\"fas fa-caret-square-up\"></i></a>| "; //---
-    body +=          "|<a href=\"/changemote?order=demote&user="+users[i]->get_user_name(); //---
-    body +=          "&mote="+access_level_reader(users[i]->get_access_level())+"\"><i id=\"up-down-icon\" class=\"fas fa-caret-square-down\"></i></a>|"; //---
-    body +=          "</pre>\n";
-  }
-  body += "      </div>\n";
-  body += "    </form>\n";
-  body += "  </div>";
-  body += "  <a href=\"/logout\" id=\"logout-icon\"><i class=\"fas fa-sign-out-alt\"></i></a>";
-  body += "  </div>";
-  body += "</body>\n";
-  body += "</html>\n";
-  body += css;
 
-  ofstream file("./static/on-time-User-list.html");
-  file << body;
+    ifstream userinf_static("static/userinf.html");
+    string users_html;
+    while( getline(userinf_static, body_line) )
+      users_html += body_line + "\n";
+
+    replace_all("$(Username)", users[i]->get_user_name(), users_html);
+    replace_all("$(Access_level)", access_level_reader(users[i]->get_access_level()), users_html);
+    users_html += "         $(Other_user)";
+
+    replace_all("$(Users)", users_html, body);
+    replace_all("$(Other_user)", "$(Users)", body);
+  }
+  replace_all("$(Users)", "", body);
+  
   return body;
 }
 
-string Core::body_folder(Document* main_doc, int &n) {
-  vector<Document*> contents = main_doc->get_contents();
-  string body;
-
-  body += "<div>\n";
-  body += "  <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-  body += "  <pre class=\"doc-line\">\n";
-  body += "    <label for=\"n-"+to_string(n)+"\"><i class=\"fas fa-folder-open\"></i> "+main_doc->get_name()+"</label>"; //---
-  if(n>0) {
-    body += (check_hole_rw_access_http(main_doc, Document::WRITE)) ? //trash icon
-             "   <a href=\"/remove?directory="+main_doc->path()+"\" class=\"black-enable\"><i class=\"fas fa-trash-alt\"></i></a>\n" :
-             "   <i class=\"red-trash-unable fas fa-trash-alt\"></i>\n";
-
-    if (check_rw_access_http(main_doc, Document::READ)) { //info icon
-      body += "      <div class=\"doc-line\">\n";
-      body += "        <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-      body += "        <label id=\"info-icon\" class=\"black-enable\" for=\"n-"+to_string(n)+"\"><i class=\"fas fa-info-circle\"></i></label>\n";
-      body += "        <div class=\"sub\">\n";
-      body += "          <p class=\"info-type\">"+main_doc->info_http()+"</p>\n";
-      body += "        </div>\n";
-      body += "      </div>\n";
-    }
-    else
-      body += "      <i class=\"red-info-unable fas fa-info-circle\"></i>\n";
-  }
-  body += "  </pre>\n";
-  body += "  <div class=\"sub\">\n";
-  body += "    <div class=\"in\">\n";
-  if(n>0 && check_rw_access_http(main_doc, Document::WRITE)) {
-    body += "      <div>\n";
-    body += "        <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-    body += "        <label for=\"n-"+to_string(n)+"\"><i class=\"fas fa-plus-square\"></i> new</label>\n";
-    body += "        <div class=\"sub\">\n";
-    body += "          <div>\n";
-    body += "            <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-    body += "            <label for=\"n-"+to_string(n)+"\"><i class=\"fas fa-folder-plus\"></i> add folder</label>\n";
-    body += "            <div class=\"sub\">\n";
-    body += "              <form class=\"branch\" action=\"/makedirectory?directory="+main_doc->path()+"\" method=\"post\">\n";
-    body += "                <input name=\"foldername\" type=\"text\" placeholder=\"new folder\" />\n";
-    body += "                <button type=\"submit\"><i id=\"add-icon\" class=\"fas fa-plus-square\"></i></button>\n";
-    body += "              </form>\n";
-    body += "            </div>\n";
-    body += "          </div>\n";
-    body += "          <div>\n";
-    body += "            <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-    body += "            <label for=\"n-"+to_string(n)+"\"><i class=\"fas fa-file-upload\"></i> upload file</label>\n";
-    body += "            <div class=\"sub\">\n";
-    body += "              <form class=\"branch\" action=\"/upload?directory="+main_doc->path()+"\" method=\"post\" enctype=\"multipart/form-data\">\n";
-    body += "                <input type=\"file\" name=\"file\"><br />\n";
-    body += "                <input name=\"file_name\" type=\"text\" placeholder=\"File Name\" />\n";
-    body += "                <button type=\"submit\" ><i id=\"add-icon\" class=\"fas fa-plus-square\"></i></button>\n";
-    body += "              </form>\n";
-    body += "            </div>\n";
-    body += "          </div>\n";
-    body += "        </div>\n";
-    body += "      </div>\n";
-  }
-  else if(n>0) {
-    body += "      <p class=\"red-unable\"><i class=\"fas fa-plus-square\"></i> new</p>\n";
-  }
-  for(int i=0; i<contents.size(); i++) {
-    if( contents[i]->is_folder() ){
-      if( check_rw_access_http(contents[i], Document::READ) )
-        body += body_folder(contents[i], n);
-      else {
-        body += "      <pre class=\"doc-line red-unable\"><i class=\"fas fa-folder-open\"></i> "+contents[i]->get_name(); //---
-        body += (check_rw_access_http(contents[i], Document::WRITE)) ? //trash icon
-                     "   <a href=\"/remove?directory="+contents[i]->path()+"\" class=\"black-enable\"><i class=\"fas fa-trash-alt\"></i></a>\n" :
-                     "   <i class=\"red-trash-unable fas fa-trash-alt\"></i>\n";
-        if (check_rw_access_http(contents[i], Document::READ)) { //info icon
-          body += "        <div class=\"doc-line\">\n";
-          body += "          <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-          body += "          <label id=\"info-icon\" class=\"black-enable\" for=\"n-"+to_string(n)+"\"><i class=\"fas fa-info-circle\"></i></label>\n";
-          body += "          <div class=\"sub\">\n";
-          body += "            <p class=\"info-type\">"+contents[i]->info_http()+"</p>\n";
-          body += "          </div>\n";
-          body += "        </div>\n";
-        }
-        else
-          body += "        <i class=\"red-info-unable fas fa-info-circle\"></i>\n";
-        body += "      </pre>\n";
-      }
-    }
-    else { // is file
-      if( check_rw_access_http(contents[i], Document::READ) ) {
-        body += "      <div>\n";
-        body += "        <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-        body += "        <pre class=\"doc-line\">\n";
-        body += "          <label for=\"n-"+to_string(n)+"\" class=\"folder\"><i class=\"fas fa-file\"></i> "+contents[i]->get_name()+"</label>"; //---
-        body += (check_rw_access_http(contents[i], Document::WRITE)) ?//trash icon
-                       "   <a href=\"/remove?directory="+contents[i]->path()+"\" class=\"black-enable\"><i class=\"fas fa-trash-alt\"></i></a>\n" :
-                       "   <i class=\"red-trash-unable fas fa-trash-alt\"></i>\n";
-        if (check_rw_access_http(contents[i], Document::READ)) {
-          body += "          <div class=\"doc-line\">\n";
-          body += "            <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-          body += "            <label id=\"info-icon\" class=\"black-enable\" for=\"n-"+to_string(n)+"\"><i class=\"fas fa-info-circle\"></i></label>\n";
-          body += "            <div class=\"sub\">\n";
-          body += "              <p class=\"info-type\">"+contents[i]->info_http()+"</p>\n";
-          body += "            </div>\n";
-          body += "          </div>\n";
-        }
-        else
-          body += "          <i class=\"red-info-unable fas fa-info-circle\"></i>\n";
-        body += "        </pre>\n";
-        body += "        <div class=\"sub\">\n";
-        body += "          <div class=\"file-options\">\n";
-        body += (check_rw_access_http(contents[i], Document::READ)) ? //read icon
-                "            <a class=\"options-info\" href=\"/show?directory="+contents[i]->path()+"\"><i class=\"fas fa-eye\" style=\"color: black;\"></i></a>\n" :
-                "            <i class=\"options-info fas fa-eye\" style=\"color: red;\"></i>\n";
-        body += (check_rw_access_http(contents[i], Document::READ)) ? //copy icon
-                "            <a class=\"options-info\" href=\"/move?directory="+contents[i]->path()+"&order=copy\"><i class=\"fas fa-copy\" style=\"color: black;\"></i></a>\n" :
-                "            <i class=\"options-info fas fa-copy\" style=\"color: red;\"></i>\n";
-        body += (check_rw_access_http(contents[i], Document::WRITE)) ? //cut icon
-                "            <a class=\"options-info\" href=\"/move?directory="+contents[i]->path()+"&order=cut\"><i class=\"fas fa-cut\" style=\"color: black;\"></i></a>\n" :
-                "            <i class=\"options-info fas fa-cut\" style=\"color: red;\"></i>\n";
-        if (check_rw_access_http(contents[i], Document::READ)) { //download icon
-          body += "            <div>\n";
-          body += "              <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-          body += "              <label class=\"options-info\" for=\"n-"+to_string(n)+"\"><i class=\"fas fa-download\" style=\"color: black;\"></i></label>\n";
-          body += "              <div class=\"sub\">\n";
-          body += "                <form class=\"branch\" action=\"/download?directory="+contents[i]->path()+"\" method=\"post\">\n";
-          body += "                  <input name=\"new-name\" type=\"text\" placeholder=\"new name\" />\n";
-          body += "                  <button type=\"submit\"><i id=\"add-icon\" class=\"fas fa-arrow-alt-circle-down\"></i></button>\n";
-          body += "                </form>\n";
-          body += "              </div>\n";
-          body += "            </div>\n";
-        }
-        else
-          body += "            <i class=\"fas fa-download\" style=\"color: red;\"></i>\n";
-        body += "          </div>\n";
-        body += "        </div>\n";
-        body += "      </div>\n";
-      }
-      else {
-        body += "      <pre class=\"doc-line red-unable\"><i class=\"fas fa-file\"></i> "+contents[i]->get_name(); //---
-        body += (check_rw_access_http(contents[i], Document::WRITE)) ? //trash icon
-                     "   <a href=\"/remove?directory="+contents[i]->path()+"\" class=\"black-enable\"><i class=\"fas fa-trash-alt\"></i></a>\n" :
-                     "   <i class=\"red-trash-unable fas fa-trash-alt\"></i>\n";
-        if (check_rw_access_http(contents[i], Document::READ)) {
-          body += "        <div class=\"doc-line\">\n";
-          body += "          <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-          body += "          <label id=\"info-icon\" class=\"black-enable\" for=\"n-"+to_string(n)+"\"><i class=\"fas fa-info-circle\"></i></label>\n";
-          body += "          <div class=\"sub\">\n";
-          body += "            <p class=\"info-type\">"+contents[i]->info_http()+"</p>\n";
-          body += "          </div>\n";
-          body += "        </div>\n";
-        }
-        else
-          body += "        <i class=\"red-info-unable fas fa-info-circle\"></i>\n";
-        body += "      </pre>\n";
-      }
-    }
-  }
-  body += "    </div>\n";
-  body += "  </div>\n";
-  body += "</div>\n";
-
-  return body;
-}
-
-string Core::setBody() {
+string Core::dashboardBody() {
   string body;
   int n=-1;
 
-  ifstream Dashboard_css("static/Dashboard.css");
-  string css, css_line;
-  while( getline(Dashboard_css,css_line) )
-    css += css_line + "\n";
+  ifstream dashboard_html("static/dashboard.html");
+  string body_line;
+  while( getline(dashboard_html, body_line) )
+    body += body_line + "\n";
 
-  body += "<!DOCTYPE html>\n";
-  body += "<html>\n";
-  body += "<head>";
-  body += "  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.6.3/css/all.css\" integrity=\"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/\" crossorigin=\"anonymous\">";
-  body += "  <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css?family=Open+Sans:400,600\">";
-  body += "  <title>Dashboard</title>";
-  body += "</head>";
-  body += "<body>\n";
-  body += "  <h1>Dashboard</h1>\n";
-  body += "  <div class=\"under_line\">\n";
-  body += "    <div class=\"left_side\">\n";
+  string usericon_html;
   if(on_time_user->get_access_level() > User::ADMIN)
-    body += "      <i class=\"left_icons fas fa-user-secret\"></i>\n";
+    usericon_html += "      <i class=\"left_icons fas fa-user-secret\"></i>\n";
   else if(on_time_user->get_access_level() == User::ADMIN)
-    body += "      <i class=\"left_icons fas fa-user-tie\"></i>\n";
+    usericon_html += "      <i class=\"left_icons fas fa-user-tie\"></i>\n";
   else
-    body += "      <i class=\"left_icons fas fa-user\"></i>\n";
-  if(on_time_user->get_access_level() >=User::ADMIN)
-    body += "      <a href=\"/users\" class=\"left_icons\"><i class=\"fas fa-users-cog\"></i></a>\n";
-  body += "    </div>\n";
-  body += "    <div class=\"main\">";
-  body += "      <i id=\"archive-icon\" class=\"fas fa-archive\"></i>";
-  body += "      <form class=\"prime\" action=\"/makedirectory\" method=\"post\">\n";
-  body += "        <h2>"+ get_working_username() +": </h2>\n";
-  body += "        <div class=\"tree\">\n";
-  body += body_folder(Root,n);
-  body += "        </div>\n";
-  body += "      </form>\n";
-  body += "    </div>";
-  body += "    <div class=\"right_side\">\n";
-  body += "      <a href=\"/logout\" id=\"logout-icon\"><i class=\"fas fa-sign-out-alt\"></i></a>";
-  body += "    </div>\n";     
-  body += "  </div>";
-  body += "</body>\n";
-  body += "</html>\n\n";
-  body += css;
+    usericon_html += "      <i class=\"left_icons fas fa-user\"></i>\n";
+  replace_all("$(User_icon)", usericon_html, body);
   
-  ofstream file("./static/on-time-dashboard.html");
+  string usertsettingicon_html;
+  if(on_time_user->get_access_level() >=User::ADMIN)
+    usertsettingicon_html += "<a href=\"/users\" class=\"left_icons\"><i class=\"fas fa-users-cog\"></i></a>\n";
+  replace_all("$(Users_setting_icon)", usertsettingicon_html, body);
+
+  replace_all("$(User_name)", get_working_username(), body);  
+  replace_all("$(Root_folder)", folderBody(Root,n), body);  
+
+  ofstream file("static/on_time_dashboard.html");
   file << body;
   return body;
 }
+
+string Core::folderBody(Document* main_doc, int &n) {
+  string body;
+
+  ifstream dashboard_html("static/folder.html");
+  string body_line;
+  while( getline(dashboard_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(N)", to_string(++n), body);
+  replace_all("$(Main_doc_name)", main_doc->get_name(), body);
+  replace_all("$(Trash&Inf_icon)", trashInfoIconBody(main_doc, ++n), body);
+  replace_all("$(New_document)", newDocumentBody(main_doc, ++n), body);
+  replace_all("$(Contents)", contentsBody(main_doc, ++n), body);
+
+  return body;
+}
+
+string Core::trashInfoIconBody(Document* main_doc, int &n) {
+  string body;
+  if((main_doc != Root)) {
+    string trashicon_html;
+    trashicon_html += (check_hole_rw_access_http(main_doc, Document::WRITE)) ?
+             "   <a href=\"/remove?directory="+main_doc->path()+"\" class=\"black-enable\"><i class=\"fas fa-trash-alt\"></i></a>\n" :
+             "   <i class=\"red-trash-unable fas fa-trash-alt\"></i>\n";
+    body += trashicon_html;
+  
+    body += infoIconBody(main_doc, ++n);
+  }
+  return body;
+}
+
+string Core::infoIconBody(Document* main_doc, int &n) {
+  string body;
+  if (check_rw_access_http(main_doc, Document::READ)) {
+    body += "      <div class=\"doc-line\">\n";
+    body += "        <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
+    body += "        <label id=\"info-icon\" class=\"black-enable\" for=\"n-"+to_string(n)+"\"><i class=\"fas fa-info-circle\"></i></label>\n";
+    body += "        <div class=\"sub\">\n";
+    body += "          <p class=\"info-type\">"+main_doc->info_http()+"</p>\n";
+    body += "        </div>\n";
+    body += "      </div>\n";
+  }
+  else
+    body += "      <i class=\"red-info-unable fas fa-info-circle\"></i>\n";
+
+  return body;
+}
+
+string Core::newDocumentBody(Document* main_doc, int &n) {
+  string body;
+  if(main_doc == Root)
+    return body;
+
+  body += ( check_rw_access_http(main_doc, Document::WRITE) ) ?
+    newIconBody(main_doc, ++n) :
+    "      <p class=\"red-unable\"><i class=\"fas fa-plus-square\"></i> new</p>\n";
+
+  return body;
+}
+
+string Core::contentsBody(Document* main_doc, int &n) {
+  vector<Document*> contents = main_doc->get_contents();
+
+  string body;
+  for(int i=0; i<contents.size(); i++) {
+    if( contents[i]->is_folder() )
+      body += (check_rw_access_http(contents[i], Document::READ)) ?
+          folderBody(contents[i], ++n) :
+          unableFolderBody(contents[i], ++n) ;
+    else
+      body += fileBody(contents[i], ++n);
+  }
+
+  return body;
+}
+
+string Core::unableFolderBody(Document* main_doc, int &n) {
+  string body;
+
+  ifstream unablefolder_html("static/unablefolder.html");
+  string body_line;
+  while( getline(unablefolder_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(Main_doc_name)", main_doc->get_name(), body);
+  replace_all("$(Trash&Inf_icon)", trashInfoIconBody(main_doc, ++n), body);
+
+  return body;
+}
+
+string Core::fileBody(Document* main_doc, int &n) {
+  string body;
+
+  body += "      <div>\n";
+      body += "        <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
+      body += "        <pre class=\"doc-line\">\n";
+      body += "          <label for=\"n-"+to_string(n)+"\" class=\"folder\"><i class=\"fas fa-file\"></i> "+main_doc->get_name()+"</label>"; //---
+      body += trashInfoIconBody(main_doc, ++n);
+      body += "        </pre>\n";
+      body += "        <div class=\"sub\">\n";
+      body += "          <div class=\"file-options\">\n";
+      body += fileIconsBody(main_doc, ++n);
+      body += "          </div>\n";
+      body += "        </div>\n";
+      body += "      </div>\n";
+
+  return body;
+}
+
+string Core::fileIconsBody(Document* main_doc, int &n) {
+  string body;
+
+  body += (check_rw_access_http(main_doc, Document::READ)) ? //read icon
+              "            <a class=\"options-info\" href=\"/show?directory="+main_doc->path()+"\"><i class=\"fas fa-eye\" style=\"color: black;\"></i></a>\n" :
+              "            <i class=\"options-info fas fa-eye\" style=\"color: red;\"></i>\n";
+      body += (check_rw_access_http(main_doc, Document::READ)) ? //copy icon
+              "            <a class=\"options-info\" href=\"/move?directory="+main_doc->path()+"&order=copy\"><i class=\"fas fa-copy\" style=\"color: black;\"></i></a>\n" :
+              "            <i class=\"options-info fas fa-copy\" style=\"color: red;\"></i>\n";
+      body += (check_rw_access_http(main_doc, Document::WRITE)) ? //cut icon
+              "            <a class=\"options-info\" href=\"/move?directory="+main_doc->path()+"&order=cut\"><i class=\"fas fa-cut\" style=\"color: black;\"></i></a>\n" :
+              "            <i class=\"options-info fas fa-cut\" style=\"color: red;\"></i>\n";
+      body += downloadIconBody(main_doc, ++n);
+
+  return body;
+}
+
+string Core::downloadIconBody(Document* main_doc, int &n) {
+  string body;
+
+  if (check_rw_access_http(main_doc, Document::READ)) {
+      ifstream downloadicon_html("static/downloadicon.html");
+      string body_line;
+      while( getline(downloadicon_html, body_line) )
+        body += body_line + "\n";
+
+      replace_all("$(N)", to_string(++n), body);
+      replace_all("$(Path)", main_doc->path(), body);
+  }
+  else
+    body += "            <i class=\"fas fa-download\" style=\"color: red;\"></i>\n";
+
+  return body;
+}
+
+string Core::newIconBody(Document* main_doc, int &n) {
+  string body;
+  body += "      <div>\n";
+    body += "        <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
+    body += "        <label for=\"n-"+to_string(n)+"\"><i class=\"fas fa-plus-square\"></i> new</label>\n";
+    body += "        <div class=\"sub\">\n";
+    body += newFolderIconBody(main_doc, ++n);
+    body += newFileIconBody(main_doc, ++n);
+    body += "        </div>\n";
+    body += "      </div>\n";
+
+  return body;
+}
+
+string Core::newFolderIconBody(Document* main_doc, int &n) {
+  string body;
+
+  ifstream newfoldericon_html("static/newfoldericon.html");
+    string body_line;
+    while( getline(newfoldericon_html, body_line) )
+      body += body_line + "\n";
+
+    replace_all("$(N)", to_string(++n), body);
+    replace_all("$(Path)", main_doc->path(), body);
+ 
+  return body;
+}
+
+string Core::newFileIconBody(Document* main_doc, int &n) {
+  string body;
+
+  ifstream newfileicon_html("static/newfileicon.html");
+    string body_line;
+    while( getline(newfileicon_html, body_line) )
+      body += body_line + "\n";
+
+    replace_all("$(N)", to_string(++n), body);
+    replace_all("$(Path)", main_doc->path(), body);
+ 
+  return body;
+}
+
+// ---------------------------------------------------------------------------------------
 
 void Core::upload_http(string real_file, string upload_path) {
     check_on_time_user();

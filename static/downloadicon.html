@@ -1,0 +1,10 @@
+<div>
+  <input id="n-$(N)" type="checkbox"></input>
+  <label class="options-info" for="n-$(N)"><i class="fas fa-download" style="color: black;"></i></label>
+  <div class="sub">
+    <form class="branch" action="/download?directory=$(Path)" method="post">
+      <input name="new-name" type="text" placeholder="new name" />
+      <button type="submit"><i id="add-icon" class="fas fa-arrow-alt-circle-down"></i></button>
+    </form>
+  </div>
+</div>

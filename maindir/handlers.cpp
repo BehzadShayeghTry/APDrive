@@ -2,13 +2,7 @@
 
 using namespace std;
 
-int find_client_index_username(std::string username, const vector<Client> clients){
-  int index;
-  for(int index=0; index<clients.size(); index++)
-    if(clients[index].username == username) return index;
-  return -1;
-}
-int find_client_index_sid(std::string sid, const vector<Client> clients){
+int find_client_index_by_sid(std::string sid, const vector<Client> clients){
   int index;
   for(int index=0; index<clients.size(); index++)
     if(clients[index].sid == sid) return index;
@@ -21,7 +15,7 @@ ShowHandler::ShowHandler(Core* _core, vector<Client> *_clients) {
 }
 
 Response *ShowHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
 
@@ -44,7 +38,7 @@ MovingHandler::MovingHandler(Core* _core, vector<Client> *_clients) {
 }
 
 Response *MovingHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
 
@@ -69,13 +63,13 @@ MoveHandler::MoveHandler(Core* _core, vector<Client> *_clients) {
 }
 
 Response *MoveHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
 
   Response *res = new Response;
   res->setHeader("Content-Type", "text/html");
-  string body = core->setPastePageBody( req->getQueryParam("directory"), req->getQueryParam("order") );
+  string body = core->pastePageBody( req->getQueryParam("directory"), req->getQueryParam("order") );
 
   res->setBody(body);
   core->logout();
@@ -88,7 +82,7 @@ DownloadHandler::DownloadHandler(Core* _core, vector<Client> *_clients) {
 }
 
 Response *DownloadHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
 
@@ -108,7 +102,7 @@ RemoveHandler::RemoveHandler(Core* _core, vector<Client> *_clients) {
 }
 
 Response *RemoveHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
 
@@ -126,7 +120,7 @@ MoteHandler::MoteHandler(Core* _core, vector<Client> *_clients) {
 }
 
 Response *MoteHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
   
@@ -160,13 +154,13 @@ UsersHandler::UsersHandler(Core* _core, vector<Client> *_clients) {
 }
 
 Response *UsersHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
   
   Response *res = new Response;
   res->setHeader("Content-Type", "text/html");
-  string body = core->setUserListBody();
+  string body = core->userListBody();
 
   res->setBody(body);
   core->logout();
@@ -179,7 +173,7 @@ UploadHandler::UploadHandler(Core* _core, vector<Client> *_clients) {
 }
 
 Response *UploadHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
 
@@ -197,7 +191,7 @@ MakeDirecroeyHandler::MakeDirecroeyHandler(Core* _core, vector<Client> *_clients
 }
 
 Response *MakeDirecroeyHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
 
@@ -215,13 +209,13 @@ DashboardHandler::DashboardHandler(Core* _core, vector<Client> *_clients) {
 }
 
 Response *DashboardHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
 
   Response *res = new Response;
   res->setHeader("Content-Type", "text/html");
-  string body = core->setBody();
+  string body = core->dashboardBody();
 
   res->setBody(body);
   core->logout();
@@ -234,7 +228,7 @@ SignupHandler::SignupHandler(Core* _core, vector<Client> *_clients) {
 }
 
 Response *SignupHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you should login first...");
   core->login((*clients)[index].username, (*clients)[index].password);
   if(core->get_working_user_accesslevel() < User::SUPERUSER)
@@ -266,7 +260,7 @@ LoginGetter::LoginGetter(Core* _core, vector<Client> *_clients) {
 }
 
 Response *LoginGetter::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   Response *res;
   res = (index == -1) ? Response::redirect("/loginpage") : Response::redirect("/dashboard");
   return res;
@@ -279,7 +273,7 @@ LoginHandler::LoginHandler(Core* _core, vector<Client> *_clients, int* n) {
 }
 
 Response *LoginHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index != -1) throw Server::Exception("logout first...");
 
   string username = req->getBodyParam("username");
@@ -309,7 +303,7 @@ LogoutHandler::LogoutHandler(vector<Client> *_clients) {
 }
 
 Response *LogoutHandler::callback(Request *req) {
-  int index = find_client_index_sid( req->getSessionId() , (*clients));
+  int index = find_client_index_by_sid( req->getSessionId() , (*clients));
   if(index == -1) throw Server::Exception("you are not already login...");
 
   (*clients).erase((*clients).begin()+index);

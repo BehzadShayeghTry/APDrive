@@ -1,0 +1,11 @@
+<div>
+  <input id="n-$(N)" type="checkbox"></input>
+  <label for="n-$(N)"><i class="fas fa-file-upload"></i> upload file</label>
+  <div class="sub">
+    <form class="branch" action="/upload?directory=$(Path)" method="post" enctype="multipart/form-data">
+      <input type="file" name="file"><br />
+      <input name="file_name" type="text" placeholder="File Name" />
+      <button type="submit" ><i id="add-icon" class="fas fa-plus-square"></i></button>
+    </form>
+  </div>
+</div>

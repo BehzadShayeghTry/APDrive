@@ -14,10 +14,22 @@ class Group;
 class Core
 {
 public:
-    std::string setBody();
-    std::string body_folder(Document*, int&);
-    std::string setUserListBody();
-    std::string setPastePageBody(std::string, std::string);
+    std::string dashboardBody();
+    std::string folderBody(Document*, int&);
+    std::string trashInfoIconBody(Document*, int&);
+    std::string infoIconBody(Document*, int&);
+    std::string newDocumentBody(Document*, int&);
+    std::string contentsBody(Document*, int&);
+    std::string unableFolderBody(Document*, int&);
+    std::string fileBody(Document*, int&);
+    std::string fileIconsBody(Document*, int&);
+    std::string downloadIconBody(Document*, int&);
+    std::string newIconBody(Document*, int&);
+    std::string newFolderIconBody(Document*, int&);
+    std::string newFileIconBody(Document*, int&);
+
+    std::string userListBody();
+    std::string pastePageBody(std::string, std::string);
     std::string body_folder_paste_page(Document*, int&, std::string, std::string);
     void upload_http(std::string, std::string);
     User::AccessLevel get_working_user_accesslevel();

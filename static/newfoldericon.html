@@ -1,0 +1,10 @@
+<div>
+  <input id="n-$(N)" type="checkbox"></input>
+  <label for="n-$(N)"><i class="fas fa-folder-plus"></i> add folder</label>
+  <div class="sub">
+    <form class="branch" action="/makedirectory?directory=$(Path)" method="post">
+      <input name="foldername" type="text" placeholder="new folder" />
+      <button type="submit"><i id="add-icon" class="fas fa-plus-square"></i></button>
+    </form>
+  </div>
+</div>
