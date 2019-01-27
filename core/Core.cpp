@@ -10,117 +10,6 @@ void replace_all(string before, string now, string& str) {
         str.replace(character, before.size(), now);
 }
 
-string Core::body_folder_paste_page(Document* main_doc, int &n, string sorce_dir, string order) {
-  vector<Document*> contents = main_doc->get_contents();
-  string body;
-
-  body += "<div>\n";
-  body += "  <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-  body += "  <pre class=\"doc-line\">\n";
-  body += "    <label for=\"n-"+to_string(n)+"\"><i class=\"fas fa-folder-open\"></i> "+main_doc->get_name()+"</label>"; //---
-  if((main_doc != Root)) {
-    body += (check_hole_rw_access_http(main_doc, Document::WRITE)) ? //paste icon
-             "   <a href=\"/moving?target-dir="+main_doc->path()+"&sorce-dir="+sorce_dir+"&order="+order+"\" class=\"black-enable\"><i class=\"fas fa-paste\"></i></a>\n" :
-             "   <i class=\"red-trash-unable fas fa-paste\"></i>\n";
-  }
-  body += "  </pre>\n";
-  body += "  <div class=\"sub\">\n";
-  body += "    <div class=\"in\">\n";
-  for(int i=0; i<contents.size(); i++) {
-    if( contents[i]->is_folder() ){
-      if( check_rw_access_http(contents[i], Document::READ) )
-        body += body_folder_paste_page(contents[i], n, sorce_dir, order);
-      else {
-        body += "      <pre class=\"doc-line red-unable\"><i class=\"fas fa-folder-open\"></i> "+contents[i]->get_name(); //---
-        body += (check_rw_access_http(contents[i], Document::WRITE)) ? //paste icon
-                     "   <a href=\"/moving?target-dir="+main_doc->path()+"&sorce-dir="+sorce_dir+"&order="+order+"\" class=\"black-enable\"><i class=\"fas fa-paste\"></i></a>\n" :
-                     "   <i class=\"red-trash-unable fas fa-paste\"></i></pre>\n";
-      }
-    }
-  }
-  body += "    </div>\n";
-  body += "  </div>\n";
-  body += "</div>\n";
-
-  return body;
-}
-
-string Core::pastePageBody(string sorce_dir, string order) {
-  string body;
-  int n=-1;
-
-  ifstream Dashboard_css("static/Dashboard.css");
-  string css, css_line;
-  while( getline(Dashboard_css,css_line) )
-    css += css_line + "\n";
-
-  body += "<!DOCTYPE html>\n";
-  body += "<html>\n";
-  body += "<head>";
-  body += "  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.6.3/css/all.css\" integrity=\"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/\" crossorigin=\"anonymous\">";
-  body += "  <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css?family=Open+Sans:400,600\">";
-  body += "  <title>Paste directory</title>";
-  body += "</head>";
-  body += "<body>\n";
-  body += "  <h1>Choose a path to Paste file:</h1>\n";
-  body += "  <div class=\"under_line\">\n";
-  body += "    <div class=\"left_side\">\n";
-  body += "      <a href=\"/dashboard\" class=\"left_icons\"><i class=\"fas fa-door-open\"></i></a>\n";
-  body += "    </div>\n";
-  body += "    <div class=\"main\">";
-  body += "      <i id=\"archive-icon\" class=\"fas fa-archive\"></i>";
-  body += "      <form class=\"prime\">\n";
-  body += "        <h2>Choose a path to Paste file: </h2>\n";
-  body += "        <div class=\"tree\">\n";
-  body += body_folder_paste_page(Root,n,sorce_dir,order);
-  body += "        </div>\n";
-  body += "      </form>\n";
-  body += "    </div>";
-  body += "    <div class=\"right_side\">\n";
-  body += "      <a href=\"/logout\" id=\"logout-icon\"><i class=\"fas fa-sign-out-alt\"></i></a>";
-  body += "    </div>\n";     
-  body += "  </div>";
-  body += "</body>\n";
-  body += "</html>\n\n";
-  body += css;
-  
-  ofstream file("./static/on-time-pasteboard.html");
-  file << body;
-  return body;
-}
-
-string Core::userListBody() {
-  string body;
-
-  ifstream userlist_static("static/userlist.html");
-  string body_line;
-  while( getline(userlist_static, body_line) )
-    body += body_line + "\n";
-
-  string adduserdoor_html;
-  if(on_time_user->get_access_level() > User::ADMIN)
-    adduserdoor_html += "      <a href=\"/signup\" class=\"left_icons\"><i class=\"fas fa-user-plus\"></i></a>\n";
-  replace_all("$(Add_user_door)", adduserdoor_html, body);
-  
-  for(int i=1; i<users.size(); i++) {
-
-    ifstream userinf_static("static/userinf.html");
-    string users_html;
-    while( getline(userinf_static, body_line) )
-      users_html += body_line + "\n";
-
-    replace_all("$(Username)", users[i]->get_user_name(), users_html);
-    replace_all("$(Access_level)", access_level_reader(users[i]->get_access_level()), users_html);
-    users_html += "         $(Other_user)";
-
-    replace_all("$(Users)", users_html, body);
-    replace_all("$(Other_user)", "$(Users)", body);
-  }
-  replace_all("$(Users)", "", body);
-  
-  return body;
-}
-
 string Core::dashboardBody() {
   string body;
   int n=-1;
@@ -130,25 +19,43 @@ string Core::dashboardBody() {
   while( getline(dashboard_html, body_line) )
     body += body_line + "\n";
 
-  string usericon_html;
-  if(on_time_user->get_access_level() > User::ADMIN)
-    usericon_html += "      <i class=\"left_icons fas fa-user-secret\"></i>\n";
-  else if(on_time_user->get_access_level() == User::ADMIN)
-    usericon_html += "      <i class=\"left_icons fas fa-user-tie\"></i>\n";
-  else
-    usericon_html += "      <i class=\"left_icons fas fa-user\"></i>\n";
-  replace_all("$(User_icon)", usericon_html, body);
-  
-  string usertsettingicon_html;
-  if(on_time_user->get_access_level() >=User::ADMIN)
-    usertsettingicon_html += "<a href=\"/users\" class=\"left_icons\"><i class=\"fas fa-users-cog\"></i></a>\n";
-  replace_all("$(Users_setting_icon)", usertsettingicon_html, body);
-
+  replace_all("$(User_icon)", userIconBody(on_time_user->get_access_level()), body);
+  replace_all("$(Users_setting_icon)", userSettingIconBody(on_time_user->get_access_level()), body);
   replace_all("$(User_name)", get_working_username(), body);  
   replace_all("$(Root_folder)", folderBody(Root,n), body);  
 
   ofstream file("static/on_time_dashboard.html");
   file << body;
+  return body;
+}
+
+string Core::userSettingIconBody(User::AccessLevel access) {
+  string body;
+
+  if(on_time_user->get_access_level() >= User::ADMIN) {
+    ifstream usertsettingicon_html("static/usersettingicon.html");
+
+    string body_line;
+    while( getline(usertsettingicon_html, body_line) ){
+      body += body_line + "\n";
+    }
+  }
+  return body;
+}
+
+string Core::userIconBody(User::AccessLevel access) {
+  string body;
+
+  ifstream usericon_html;
+  usericon_html = (access > User::ADMIN) ?
+      ifstream("static/superusericon.html") : (access == User::ADMIN) ?
+      ifstream("static/adminusericon.html") :
+      ifstream("static/simpleusericon.html");
+
+  string body_line;
+  while( getline(usericon_html, body_line) )
+    body += body_line + "\n";
+
   return body;
 }
 
@@ -172,44 +79,52 @@ string Core::folderBody(Document* main_doc, int &n) {
 string Core::trashInfoIconBody(Document* main_doc, int &n) {
   string body;
   if((main_doc != Root)) {
-    string trashicon_html;
-    trashicon_html += (check_hole_rw_access_http(main_doc, Document::WRITE)) ?
-             "   <a href=\"/remove?directory="+main_doc->path()+"\" class=\"black-enable\"><i class=\"fas fa-trash-alt\"></i></a>\n" :
-             "   <i class=\"red-trash-unable fas fa-trash-alt\"></i>\n";
-    body += trashicon_html;
-  
+    body += trashIconBody(main_doc);
     body += infoIconBody(main_doc, ++n);
   }
   return body;
 }
 
+string Core::trashIconBody(Document* main_doc) {
+  string body;
+
+  ifstream trashicon_html;
+  trashicon_html = (check_hole_rw_access_http(main_doc, Document::WRITE)) ?
+      ifstream("static/trashicon.html") :
+      ifstream("static/unabletrashicon.html");
+
+  string body_line;
+  while( getline(trashicon_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(Path)", main_doc->path(), body);
+
+  return body;
+}
+
 string Core::infoIconBody(Document* main_doc, int &n) {
   string body;
-  if (check_rw_access_http(main_doc, Document::READ)) {
-    body += "      <div class=\"doc-line\">\n";
-    body += "        <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-    body += "        <label id=\"info-icon\" class=\"black-enable\" for=\"n-"+to_string(n)+"\"><i class=\"fas fa-info-circle\"></i></label>\n";
-    body += "        <div class=\"sub\">\n";
-    body += "          <p class=\"info-type\">"+main_doc->info_http()+"</p>\n";
-    body += "        </div>\n";
-    body += "      </div>\n";
-  }
-  else
-    body += "      <i class=\"red-info-unable fas fa-info-circle\"></i>\n";
+
+  ifstream infoicon_html;
+  infoicon_html = (check_rw_access_http(main_doc, Document::WRITE)) ?
+      ifstream("static/infoicon.html") :
+      ifstream("static/unableinfoicon.html");
+  
+  string body_line;
+  while( getline(infoicon_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(N)", to_string(++n), body);
+  replace_all("$(Main_doc_info)", main_doc->info_http(), body);
 
   return body;
 }
 
 string Core::newDocumentBody(Document* main_doc, int &n) {
-  string body;
   if(main_doc == Root)
-    return body;
-
-  body += ( check_rw_access_http(main_doc, Document::WRITE) ) ?
-    newIconBody(main_doc, ++n) :
-    "      <p class=\"red-unable\"><i class=\"fas fa-plus-square\"></i> new</p>\n";
-
-  return body;
+    return "";
+  else
+    return newIconBody(main_doc, ++n);
 }
 
 string Core::contentsBody(Document* main_doc, int &n) {
@@ -245,18 +160,15 @@ string Core::unableFolderBody(Document* main_doc, int &n) {
 string Core::fileBody(Document* main_doc, int &n) {
   string body;
 
-  body += "      <div>\n";
-      body += "        <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-      body += "        <pre class=\"doc-line\">\n";
-      body += "          <label for=\"n-"+to_string(n)+"\" class=\"folder\"><i class=\"fas fa-file\"></i> "+main_doc->get_name()+"</label>"; //---
-      body += trashInfoIconBody(main_doc, ++n);
-      body += "        </pre>\n";
-      body += "        <div class=\"sub\">\n";
-      body += "          <div class=\"file-options\">\n";
-      body += fileIconsBody(main_doc, ++n);
-      body += "          </div>\n";
-      body += "        </div>\n";
-      body += "      </div>\n";
+  ifstream file_html("static/file.html");
+  string body_line;
+  while( getline(file_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(N)", to_string(++n), body);
+  replace_all("$(Main_doc_name)", main_doc->get_name(), body);
+  replace_all("$(Trash&Inf_icon)", trashInfoIconBody(main_doc, ++n), body);
+  replace_all("$(Actions)", fileIconsBody(main_doc, ++n), body);
 
   return body;
 }
@@ -264,16 +176,61 @@ string Core::fileBody(Document* main_doc, int &n) {
 string Core::fileIconsBody(Document* main_doc, int &n) {
   string body;
 
-  body += (check_rw_access_http(main_doc, Document::READ)) ? //read icon
-              "            <a class=\"options-info\" href=\"/show?directory="+main_doc->path()+"\"><i class=\"fas fa-eye\" style=\"color: black;\"></i></a>\n" :
-              "            <i class=\"options-info fas fa-eye\" style=\"color: red;\"></i>\n";
-      body += (check_rw_access_http(main_doc, Document::READ)) ? //copy icon
-              "            <a class=\"options-info\" href=\"/move?directory="+main_doc->path()+"&order=copy\"><i class=\"fas fa-copy\" style=\"color: black;\"></i></a>\n" :
-              "            <i class=\"options-info fas fa-copy\" style=\"color: red;\"></i>\n";
-      body += (check_rw_access_http(main_doc, Document::WRITE)) ? //cut icon
-              "            <a class=\"options-info\" href=\"/move?directory="+main_doc->path()+"&order=cut\"><i class=\"fas fa-cut\" style=\"color: black;\"></i></a>\n" :
-              "            <i class=\"options-info fas fa-cut\" style=\"color: red;\"></i>\n";
-      body += downloadIconBody(main_doc, ++n);
+  body += readIconBody(main_doc);
+  body += copyIconBody(main_doc);
+  body += cutIconBody(main_doc);
+  body += downloadIconBody(main_doc, ++n);
+
+  return body;
+}
+
+string Core::readIconBody(Document* main_doc) {
+  string body;
+
+  ifstream readicon_html;
+  readicon_html = (check_rw_access_http(main_doc, Document::WRITE)) ?
+      ifstream("static/readicon.html") :
+      ifstream("static/unablereadicon.html");
+  
+  string body_line;
+  while( getline(readicon_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(Path)", main_doc->path(), body);
+
+  return body;
+}
+
+string Core::copyIconBody(Document* main_doc) {
+  string body;
+
+  ifstream copyicon_html;
+  copyicon_html = (check_rw_access_http(main_doc, Document::WRITE)) ?
+      ifstream("static/copyicon.html") :
+      ifstream("static/unablecopyicon.html");
+  
+  string body_line;
+  while( getline(copyicon_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(Path)", main_doc->path(), body);
+
+  return body;
+}
+
+string Core::cutIconBody(Document* main_doc) {
+  string body;
+
+  ifstream cuticon_html;
+  cuticon_html = (check_rw_access_http(main_doc, Document::WRITE)) ?
+      ifstream("static/cuticon.html") :
+      ifstream("static/unablecuticon.html");
+  
+  string body_line;
+  while( getline(cuticon_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(Path)", main_doc->path(), body);
 
   return body;
 }
@@ -281,31 +238,36 @@ string Core::fileIconsBody(Document* main_doc, int &n) {
 string Core::downloadIconBody(Document* main_doc, int &n) {
   string body;
 
-  if (check_rw_access_http(main_doc, Document::READ)) {
-      ifstream downloadicon_html("static/downloadicon.html");
-      string body_line;
-      while( getline(downloadicon_html, body_line) )
-        body += body_line + "\n";
+  ifstream downloadicon_html;
+  downloadicon_html = (check_rw_access_http(main_doc, Document::READ)) ?
+      ifstream("static/downloadicon.html") :
+      ifstream("static/unabledownloadicon.html");
 
-      replace_all("$(N)", to_string(++n), body);
-      replace_all("$(Path)", main_doc->path(), body);
-  }
-  else
-    body += "            <i class=\"fas fa-download\" style=\"color: red;\"></i>\n";
+  string body_line;
+  while( getline(downloadicon_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(N)", to_string(++n), body);
+  replace_all("$(Path)", main_doc->path(), body);
 
   return body;
 }
 
 string Core::newIconBody(Document* main_doc, int &n) {
   string body;
-  body += "      <div>\n";
-    body += "        <input id=\"n-"+to_string(++n)+"\" type=\"checkbox\"></input>\n";
-    body += "        <label for=\"n-"+to_string(n)+"\"><i class=\"fas fa-plus-square\"></i> new</label>\n";
-    body += "        <div class=\"sub\">\n";
-    body += newFolderIconBody(main_doc, ++n);
-    body += newFileIconBody(main_doc, ++n);
-    body += "        </div>\n";
-    body += "      </div>\n";
+
+  ifstream newicon_html("static/newicon.html");
+  newicon_html = ( check_rw_access_http(main_doc, Document::WRITE) ) ?
+      ifstream("static/newicon.html") :
+      ifstream("static/unablenewicon.html");
+
+  string body_line;
+  while( getline(newicon_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(N)", to_string(++n), body);
+  replace_all("$(New_folder)", newFolderIconBody(main_doc, ++n), body);
+  replace_all("$(New_file)", newFileIconBody(main_doc, ++n), body);
 
   return body;
 }
@@ -314,12 +276,12 @@ string Core::newFolderIconBody(Document* main_doc, int &n) {
   string body;
 
   ifstream newfoldericon_html("static/newfoldericon.html");
-    string body_line;
-    while( getline(newfoldericon_html, body_line) )
-      body += body_line + "\n";
+  string body_line;
+  while( getline(newfoldericon_html, body_line) )
+    body += body_line + "\n";
 
-    replace_all("$(N)", to_string(++n), body);
-    replace_all("$(Path)", main_doc->path(), body);
+  replace_all("$(N)", to_string(++n), body);
+  replace_all("$(Path)", main_doc->path(), body);
  
   return body;
 }
@@ -328,13 +290,136 @@ string Core::newFileIconBody(Document* main_doc, int &n) {
   string body;
 
   ifstream newfileicon_html("static/newfileicon.html");
+  string body_line;
+  while( getline(newfileicon_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(N)", to_string(++n), body);
+  replace_all("$(Path)", main_doc->path(), body);
+ 
+  return body;
+}
+
+string Core::userListBody() {
+  string body;
+
+  ifstream userlist_static("static/userlist.html");
+  string body_line;
+  while( getline(userlist_static, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(Add_user_door)", addUserdoorIconBody(on_time_user->get_access_level()), body);
+  
+  for(int i=1; i<users.size(); i++) {
+
+    ifstream userinf_html("static/userinf.html");
+    string users_html;
+    while( getline(userinf_html, body_line) )
+      users_html += body_line + "\n";
+
+    replace_all("$(Username)", users[i]->get_user_name(), users_html);
+    replace_all("$(Access_level)", access_level_reader(users[i]->get_access_level()), users_html);
+    users_html += "$(Other_user)";
+
+    replace_all("$(Users)", users_html, body);
+    replace_all("$(Other_user)", "$(Users)", body);
+  }
+  replace_all("$(Users)", "", body);
+  
+  return body;
+}
+
+string Core::addUserdoorIconBody(User::AccessLevel access) {
+  string body;
+
+  if(access > User::ADMIN) {
+    ifstream adduserdooricon_html("static/adduserdooricon.html");
+
     string body_line;
-    while( getline(newfileicon_html, body_line) )
+    while( getline(adduserdooricon_html, body_line) )
+      body += body_line + "\n";
+  }
+  return body;
+}
+
+string Core::pastePageBody(string sorce_dir, string order) {
+  string body;
+  int n=-1;
+
+  ifstream pastepage_html("static/pastepage.html");
+  string body_line;
+  while( getline(pastepage_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(Root_folder)", pasteFolderPageBody(Root,n,sorce_dir,order), body);
+
+  ofstream file("./static/on-time-pasteboard.html");
+  file << body;
+  return body;
+}
+
+string Core::pasteFolderPageBody(Document* main_doc, int &n, string sorce_dir, string order) {
+  string body;
+
+  ifstream pastefolderpage_html("static/pastefolderpage.html");
+  string body_line;
+  while( getline(pastefolderpage_html, body_line) )
+    body += body_line + "\n";
+
+  replace_all("$(N)", to_string(++n), body);
+  replace_all("$(Main_doc_name)", main_doc->get_name(), body);
+  replace_all("$(Paste_icon)", pasteIconBody(main_doc,sorce_dir,order), body);
+  replace_all("$(Contents)", pasteContentsBody(main_doc,sorce_dir,order,++n), body);
+  
+  return body;
+}
+
+string Core::pasteIconBody(Document* main_doc, string sorce_dir, string order) {
+  string body;
+
+  if((main_doc != Root)) {
+
+    ifstream pasteicon_html;
+    pasteicon_html = (check_hole_rw_access_http(main_doc, Document::WRITE)) ?
+        ifstream("static/pasteicon.html") :
+        ifstream("static/unablepasteicon.html");
+
+    string body_line;
+    while( getline(pasteicon_html, body_line) )
       body += body_line + "\n";
 
-    replace_all("$(N)", to_string(++n), body);
     replace_all("$(Path)", main_doc->path(), body);
- 
+    replace_all("$(Sorce)", sorce_dir, body);
+    replace_all("$(Order)", order, body);
+  }
+  return body;
+}
+
+string Core::pasteContentsBody(Document* main_doc, string sorce_dir, string order, int& n) {
+  vector<Document*> contents = main_doc->get_contents();
+  string body;
+
+  for(int i=0; i<contents.size(); i++) {
+    if( contents[i]->is_folder() ) {
+      body += ( check_rw_access_http(contents[i], Document::READ) ) ?
+          pasteFolderPageBody(contents[i], ++n, sorce_dir, order) :
+          unablePasteFolderPageBody(contents[i], sorce_dir, order);
+    }
+  }
+  return body;
+}
+
+string Core::unablePasteFolderPageBody(Document* main_doc, string sorce_dir, string order) {
+  string body;
+
+  ifstream unablepastefolder_html("static/unablepastefolder.html");
+  string body_line;
+    while( getline(unablepastefolder_html, body_line) )
+      body += body_line + "\n";
+
+  replace_all("$(Main_doc_name)", main_doc->get_name(), body);
+  replace_all("$(Paste_icon)", pasteIconBody(main_doc,sorce_dir,order), body);
+
   return body;
 }
 

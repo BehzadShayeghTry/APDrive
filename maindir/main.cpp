@@ -46,4 +46,6 @@ int main(int argc, char **argv) {
   catch (Server::Exception e) {
     cerr << red << e.getMessage() << reset << endl;
   }
+
+  delete core;
 }
