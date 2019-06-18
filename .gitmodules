@@ -1,0 +1,3 @@
+[submodule "HttpFrameworkSource"]
+	path = HttpFrameworkSource
+	url = https://github.com/UTAP/APHTTP.git
